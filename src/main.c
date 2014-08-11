@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "Graphics.h"
+#include "Mouse.h"
 #include "OS.h"
 #include "Utilities.h"
 
@@ -25,14 +26,32 @@ int main(int argc, char **argv) {
 
 	srand(time(NULL));
 	sef_startup();
-	initGraphics(0x117);
+
+	/*
+	 * -------------------
+	 * VESA graphics modes
+	 *      16-bit (5:6:5)
+	 * -------------------
+	 *   320×200 - 0x10E
+	 *   640×480 - 0x111
+	 *   800×600 - 0x114
+	 *  1024×768 - 0x117
+	 * 1280×1024 - 0x11A
+	 * -------------------
+	 */
+	initGraphics(0x114);
 
 	OS* os = (OS*) startOS();
 	while (!os->done) {
 		updateOS(os);
 
-		if (os->draw && !os->done)
-			drawOS(os);
+		if (!os->done) {
+			if (os->draw)
+				drawOS(os);
+
+			if (getMouse()->draw)
+				drawMouse(getMouse());
+		}
 	}
 	stopOS(os);
 

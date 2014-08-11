@@ -21,6 +21,8 @@ typedef struct {
 
 	int byteBeingRead;
 	unsigned long packet[3];
+
+	int draw;
 } Mouse;
 
 /**

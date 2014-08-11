@@ -4,7 +4,7 @@ CC = gcc
 
 PROG = os
 SRCS = main.c OS.c
-SRCS += VBE.c Graphics.c Keyboard.c KBC.c Mouse.c
+SRCS += VBE.c Graphics.c Timer.c Keyboard.c KBC.c Mouse.c
 SRCS += Utilities.c Point.c
 
 CCFLAGS= -Wall -O3

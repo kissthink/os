@@ -1,8 +1,6 @@
 #pragma once
 
-typedef enum {
-	MainMenuState, PlayState
-} State;
+#include "Timer.h"
 
 typedef struct {
 	int IRQ_SET_KB;
@@ -10,9 +8,10 @@ typedef struct {
 	int IRQ_SET_TIMER;
 
 	int done, draw;
+	Timer* timer;
+	unsigned long scancode;
 
-	State currentState;
-	void* state;
+	unsigned int taskbarHeight;
 } OS;
 
 OS* initOS();

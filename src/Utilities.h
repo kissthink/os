@@ -8,7 +8,7 @@ extern FILE* logfd;
 #define LOG(tag, msg) fprintf(logfd, "%s: %s\n", tag, msg)
 #define LOG_VAR(tag, var) fprintf(logfd, "%s: %d\n", tag, var)
 
-#define FPS 60
+extern const int FPS, drawFPS;
 #define BIT(n) (0x01 << n)
 #define singleBit(byte) (0x01 & byte)
 

@@ -3,6 +3,7 @@
 #include <minix/drivers.h>
 #include "Mouse.h"
 
+#include <math.h>
 #include "Graphics.h"
 #include "KBC.h"
 #include "Utilities.h"
@@ -29,7 +30,12 @@ Mouse* newMouse() {
 	mouse->y = 0;
 	mouse->speedMultiplier = 1.4;
 
+	mouse->hasBeenUpdated = 0;
+	mouse->leftButtonReleased = 0;
+
 	mouse->byteBeingRead = 0;
+
+	mouse->draw = 1;
 
 	return mouse;
 }
@@ -105,19 +111,92 @@ void updateMouse(Mouse* mouse) {
 	}
 }
 
-void drawMouse(Mouse* mouse) {
+int setDirectPixel(long x, long y, int color) {
+	if (x < 0 || y < 0 || x >= getHorResolution() || y >= getVerResolution())
+		return -1;
+
+	int id = (x + y * getHorResolution()) * getBytesPerPixel();
+	getGraphicsMBuffer()[id] = color & 0xFF;
+	getGraphicsMBuffer()[id + 1] = (color >> 8) & 0xFF;
+
+	return 0;
+}
+
+int drawDirectLine(long xi, long yi, long xf, long yf, int color) {
+	int a = abs(xf - xi);
+	int b = abs(yf - yi);
+
+	int invertXY = 0;
+	if (b > a) {
+		swap(int, xi, yi);
+		swap(int, xf, yf);
+		swap(int, a, b);
+		invertXY = 1;
+	}
+
+	if (xf < xi) {
+		swap(int, xi, xf);
+		swap(int, yi, yf);
+	}
+
+	// do not touch this
+	int inc2 = 2 * b;
+	int d = inc2 - a;	// d = 2*b – a;
+	int inc1 = d - a;	// inc1 = 2*(b-a);
+
+	int i, x = xi, y = yi;
+	for (i = 0; i <= a; i++, x++) {
+		invertXY ? setDirectPixel(y, x, color) : setDirectPixel(x, y, color);
+
+		if (d >= 0)
+			yi > yf ? y-- : y++, d += inc1;
+		else
+			d += inc2;
+	}
+
+	return 0;
+}
+
+void drawCrosshair(Mouse* mouse) {
 	int x = mouse->x, y = mouse->y;
 	int size = 3;
 
 	// black borders
-	drawLine(x - size, y - 1, x + size, y - 1, BLACK);
-	drawLine(x - size, y + 1, x + size, y + 1, BLACK);
-	drawLine(x - 1, y - size, x - 1, y + size, BLACK);
-	drawLine(x + 1, y - size, x + 1, y + size, BLACK);
+	drawDirectLine(x - size, y - 1, x + size, y - 1, BLACK);
+	drawDirectLine(x - size, y + 1, x + size, y + 1, BLACK);
+	drawDirectLine(x - 1, y - size, x - 1, y + size, BLACK);
+	drawDirectLine(x + 1, y - size, x + 1, y + size, BLACK);
 
 	// white inside
-	drawLine(x - size, y, x + size, y, WHITE);
-	drawLine(x, y - size, x, y + size, WHITE);
+	drawDirectLine(x - size, y, x + size, y, WHITE);
+	drawDirectLine(x, y - size, x, y + size, WHITE);
+}
+
+/*
+ void drawArrow(Mouse* mouse) {
+ int x = mouse->x, y = mouse->y;
+ int size = 8;
+
+ int tx = x + size;
+ int ty = y + sqrt(4 * size * size - size * size);
+
+ // black borders
+ drawLine(x, y, x, y + 2 * size, BLACK);
+ drawLine(x, y, tx, ty, BLACK);
+ drawLine(x, y + 2 * size, tx, ty, BLACK);
+
+ // white inside
+ }
+ */
+
+void drawMouse(Mouse* mouse) {
+	flipMBuffer();
+
+	drawCrosshair(mouse);
+	//drawArrow(mouse);
+
+	flipDisplay();
+	mouse->draw = 0;
 }
 
 void deleteMouse(Mouse* mouse) {

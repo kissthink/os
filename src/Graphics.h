@@ -11,12 +11,18 @@
 // user-friendly color names
 #define BLACK rgb(0, 0, 0)
 #define BLUE rgb(0, 0, 255)
-#define GREEN rgb(0, 255, 0)
 #define CYAN rgb(0, 255, 255)
-#define RED rgb(255, 0, 0)
+#define DARK_GRAY rgb(169, 169, 169)
+#define GRAY rgb(128, 128, 128)
+#define GREEN rgb(0, 255, 0)
+#define LIGHT_GRAY rgb(211, 211, 211)
+#define NAVY rgb(0, 0, 128)
 #define ORANGE rgb(255, 102, 0)
-#define YELLOW rgb(255,255, 0)
+#define RED rgb(255, 0, 0)
+#define SILVER rgb(192, 192, 192)
+#define TEAL rgb(0, 128, 128)
 #define WHITE rgb(255, 255, 255)
+#define YELLOW rgb(255,255, 0)
 
 /**
  * @brief Initializes the video module in graphics mode
@@ -31,10 +37,13 @@
  */
 void *initGraphics(unsigned short mode);
 
+char* getVideoMem();
+char* getGraphicsMBuffer();
 char* getGraphicsBuffer();
 
 int getHorResolution(); ///< Returns horizontal resolution
 int getVerResolution(); ///< Returns vertical resolution
+int getBytesPerPixel();
 
 /**
  * @brief Maps RGB color
@@ -50,6 +59,11 @@ int rgb(unsigned char r, unsigned char g, unsigned char b);
  * @brief Copies the graphic buffer to video_mem to print graphics to display
  */
 void flipDisplay();
+
+/**
+ * @brief Copies the graphic buffer to graphics mouse buffer
+ */
+void flipMBuffer();
 
 /**
  * @brief Fills the screen with the input color

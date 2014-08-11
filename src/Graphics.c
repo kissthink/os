@@ -14,6 +14,7 @@
 static vbe_mode_info_t vbeInfo;
 
 static char* videoMem; /* Process address to which VRAM is mapped */
+static char* mBuffer;
 static char* buffer;
 static unsigned int videoMemSize;
 
@@ -59,9 +60,18 @@ void* initGraphics(unsigned short mode) {
 		panic("video_txt: sys_privctl (ADD_MEM) failed: %d\n", reg);
 
 	videoMem = vm_map_phys(SELF, (void*) mr.mr_base, videoMemSize);
+	mBuffer = (char*) malloc(videoMemSize);
 	buffer = (char*) malloc(videoMemSize);
 
 	return videoMem;
+}
+
+char* getVideoMem() {
+	return videoMem;
+}
+
+char* getGraphicsMBuffer() {
+	return mBuffer;
 }
 
 char* getGraphicsBuffer() {
@@ -74,6 +84,10 @@ int getHorResolution() {
 
 int getVerResolution() {
 	return verResolution;
+}
+
+int getBytesPerPixel() {
+	return bytesPerPixel;
 }
 
 int rgb(unsigned char r, unsigned char g, unsigned char b) {
@@ -89,27 +103,39 @@ int rgb(unsigned char r, unsigned char g, unsigned char b) {
 }
 
 void flipDisplay() {
-	memcpy(videoMem, buffer, videoMemSize);
+	memcpy(videoMem, mBuffer, videoMemSize);
+}
+
+void flipMBuffer() {
+	memcpy(mBuffer, buffer, videoMemSize);
 }
 
 int fillDisplay(int color) {
 	char *ptr = buffer;
 
+	// fill one line
 	int i;
-	for (i = 0; i < horResolution * verResolution; i++, ptr++) {
+	for (i = 0; i < horResolution; i++, ptr++) {
 		*ptr = (char) (color & 0xFF);
 		ptr++;
 		*ptr = (char) ((color >> 8) & 0xFF);
 	}
 
+	// get pointer to that line
+	int screenWidthBytes = horResolution * bytesPerPixel;
+
+	// copy and paste first line
+	for (i = 1; i < verResolution; i++)
+		memcpy(buffer + i * screenWidthBytes, buffer, screenWidthBytes);
+
 	return 0;
 }
 
 int setPixel(long x, long y, int color) {
-	if (x < 0 || y < 0 || x >= horResolution || y >= verResolution)
+	if (x < 0 || y < 0 || x >= getHorResolution() || y >= getVerResolution())
 		return -1;
 
-	int id = (x + y * horResolution) * bytesPerPixel;
+	int id = (x + y * getHorResolution()) * getBytesPerPixel();
 	buffer[id] = color & 0xFF;
 	buffer[id + 1] = (color >> 8) & 0xFF;
 
@@ -117,10 +143,10 @@ int setPixel(long x, long y, int color) {
 }
 
 unsigned short getPixel(long x, long y) {
-	if (x < 0 || y < 0 || x >= horResolution || y >= verResolution)
+	if (x < 0 || y < 0 || x >= getHorResolution() || y >= getVerResolution())
 		return -1;
 
-	int id = (x + y * horResolution) * bytesPerPixel;
+	int id = (x + y * getHorResolution()) * getBytesPerPixel();
 
 	unsigned short color = 0;
 	color |= buffer[id] & 0xFF;
@@ -151,18 +177,13 @@ int drawLine(long xi, long yi, long xf, long yf, int color) {
 	int d = inc2 - a;	// d = 2*b – a;
 	int inc1 = d - a;	// inc1 = 2*(b-a);
 
-	int x = xi, y = yi;
-
-	int i;
+	int i, x = xi, y = yi;
 	for (i = 0; i <= a; i++, x++) {
 		invertXY ? setPixel(y, x, color) : setPixel(x, y, color);
 
-		if (d >= 0) {
-			if (yi > yf)
-				y--;
-			else
-				y++, d += inc1;
-		} else
+		if (d >= 0)
+			yi > yf ? y-- : y++, d += inc1;
+		else
 			d += inc2;
 	}
 
@@ -206,17 +227,17 @@ int drawFilledRectangle(long xi, long yi, long xf, long yf, int color) {
 
 	// process one line
 	int i;
-	for (i = xi; i <= xf; i++)
+	for (i = xi; i < xf; i++)
 		setPixel(i, yi, color);
 
 	// get pointer to that line
 	char* line = buffer + (xi + yi * horResolution) * bytesPerPixel;
 
 	int screenWidthBytes = horResolution * bytesPerPixel;
-	int lineBytes = (xf + 1 - xi) * bytesPerPixel;
+	int lineBytes = (xf - xi) * bytesPerPixel;
 
 	// copy and paste first line
-	for (i = 1; i <= yf - yi; i++)
+	for (i = 1; i < yf - yi; i++)
 		memcpy(line + i * screenWidthBytes, line, lineBytes);
 
 	return 0;
