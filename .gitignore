@@ -2,5 +2,8 @@
 *.exe
 *.out
 
+*.depend
 *.d
 *.o
+
+os
