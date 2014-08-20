@@ -6,4 +6,5 @@
 *.d
 *.o
 
+log.txt
 os
