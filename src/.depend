@@ -1,4 +1,15 @@
 
+Bitmap.o:	/usr/include/minix/dir.h
+Bitmap.o:	/usr/include/minix/types.h
+Bitmap.o:	/usr/include/sys/null.h
+Bitmap.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/ansi.h
+Bitmap.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/stdio.h
+Bitmap.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include/stdarg.h
+Bitmap.o:	Bitmap.c
+Bitmap.o:	Bitmap.h
+Bitmap.o:	Graphics.h
+Bitmap.o:	Utilities.h
+
 Graphics.o:	/usr/include/errno.h
 Graphics.o:	/usr/include/limits.h
 Graphics.o:	/usr/include/machine/bios.h
@@ -173,6 +184,7 @@ Mouse.o:	/usr/include/machine/interrupt.h
 Mouse.o:	/usr/include/machine/mcontext.h
 Mouse.o:	/usr/include/machine/ports.h
 Mouse.o:	/usr/include/machine/stackframe.h
+Mouse.o:	/usr/include/mathconst.h
 Mouse.o:	/usr/include/minix/bitmap.h
 Mouse.o:	/usr/include/minix/callnr.h
 Mouse.o:	/usr/include/minix/com.h
@@ -206,6 +218,7 @@ Mouse.o:	/usr/include/sys/ucred.h
 Mouse.o:	/usr/include/timers.h
 Mouse.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/ansi.h
 Mouse.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/limits.h
+Mouse.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/math.h
 Mouse.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/signal.h
 Mouse.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/stddef.h
 Mouse.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/stdio.h
@@ -219,6 +232,11 @@ Mouse.o:	KBC.h
 Mouse.o:	Mouse.c
 Mouse.o:	Mouse.h
 Mouse.o:	Utilities.h
+
+MouseOptionsMenu.o:	Graphics.h
+MouseOptionsMenu.o:	Mouse.h
+MouseOptionsMenu.o:	MouseOptionsMenu.c
+MouseOptionsMenu.o:	MouseOptionsMenu.h
 
 OS.o:	/usr/include/errno.h
 OS.o:	/usr/include/limits.h
@@ -269,12 +287,18 @@ OS.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/string.h
 OS.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/syslimits.h
 OS.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/unistd.h
 OS.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include/stdarg.h
+OS.o:	Bitmap.h
 OS.o:	Graphics.h
 OS.o:	Keyboard.h
 OS.o:	Mouse.h
+OS.o:	MouseOptionsMenu.h
 OS.o:	OS.c
 OS.o:	OS.h
+OS.o:	Task.h
+OS.o:	Timer.h
 OS.o:	Utilities.h
+OS.o:	Window.h
+OS.o:	WindowContent.h
 
 Point.o:	/usr/include/minix/dir.h
 Point.o:	/usr/include/minix/types.h
@@ -284,6 +308,64 @@ Point.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/stdio.h
 Point.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include/stdarg.h
 Point.o:	Point.c
 Point.o:	Point.h
+
+Task.o:	Task.c
+Task.o:	Task.h
+Task.o:	Window.h
+
+Timer.o:	/usr/include/errno.h
+Timer.o:	/usr/include/limits.h
+Timer.o:	/usr/include/machine/bios.h
+Timer.o:	/usr/include/machine/fpu.h
+Timer.o:	/usr/include/machine/interrupt.h
+Timer.o:	/usr/include/machine/mcontext.h
+Timer.o:	/usr/include/machine/ports.h
+Timer.o:	/usr/include/machine/stackframe.h
+Timer.o:	/usr/include/minix/bitmap.h
+Timer.o:	/usr/include/minix/callnr.h
+Timer.o:	/usr/include/minix/com.h
+Timer.o:	/usr/include/minix/config.h
+Timer.o:	/usr/include/minix/const.h
+Timer.o:	/usr/include/minix/devio.h
+Timer.o:	/usr/include/minix/dir.h
+Timer.o:	/usr/include/minix/dmap.h
+Timer.o:	/usr/include/minix/drivers.h
+Timer.o:	/usr/include/minix/endpoint.h
+Timer.o:	/usr/include/minix/ipc.h
+Timer.o:	/usr/include/minix/ipcconst.h
+Timer.o:	/usr/include/minix/limits.h
+Timer.o:	/usr/include/minix/safecopies.h
+Timer.o:	/usr/include/minix/sef.h
+Timer.o:	/usr/include/minix/spin.h
+Timer.o:	/usr/include/minix/sys_config.h
+Timer.o:	/usr/include/minix/syslib.h
+Timer.o:	/usr/include/minix/sysutil.h
+Timer.o:	/usr/include/minix/timers.h
+Timer.o:	/usr/include/minix/type.h
+Timer.o:	/usr/include/minix/types.h
+Timer.o:	/usr/include/minix/u64.h
+Timer.o:	/usr/include/minix/vm.h
+Timer.o:	/usr/include/stdint.h
+Timer.o:	/usr/include/sys/cdefs.h
+Timer.o:	/usr/include/sys/null.h
+Timer.o:	/usr/include/sys/param.h
+Timer.o:	/usr/include/sys/types.h
+Timer.o:	/usr/include/sys/ucred.h
+Timer.o:	/usr/include/timers.h
+Timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/ansi.h
+Timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/limits.h
+Timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/signal.h
+Timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/stddef.h
+Timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/stdio.h
+Timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/stdlib.h
+Timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/string.h
+Timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/syslimits.h
+Timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/unistd.h
+Timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include/stdarg.h
+Timer.o:	Timer.c
+Timer.o:	Timer.h
+Timer.o:	Utilities.h
+Timer.o:	i8254.h
 
 Utilities.o:	/usr/include/minix/dir.h
 Utilities.o:	/usr/include/minix/types.h
@@ -350,6 +432,16 @@ VBE.o:	Utilities.h
 VBE.o:	VBE.c
 VBE.o:	VBE.h
 
+Window.o:	Graphics.h
+Window.o:	Mouse.h
+Window.o:	Window.c
+Window.o:	Window.h
+Window.o:	WindowContent.h
+
+WindowContent.o:	Graphics.h
+WindowContent.o:	WindowContent.c
+WindowContent.o:	WindowContent.h
+
 main.o:	/usr/include/assert.h
 main.o:	/usr/include/errno.h
 main.o:	/usr/include/limits.h
@@ -401,6 +493,11 @@ main.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/syslimits.h
 main.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/unistd.h
 main.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include/stdarg.h
 main.o:	Graphics.h
+main.o:	Mouse.h
+main.o:	MouseOptionsMenu.h
 main.o:	OS.h
+main.o:	Task.h
+main.o:	Timer.h
 main.o:	Utilities.h
+main.o:	Window.h
 main.o:	main.c

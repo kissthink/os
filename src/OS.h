@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Bitmap.h"
+#include "MouseOptionsMenu.h"
+#include "Task.h"
 #include "Timer.h"
 
 typedef struct {
@@ -11,7 +14,12 @@ typedef struct {
 	Timer* timer;
 	unsigned long scancode;
 
+	int useBackgroundImage, backgroundColor;
+	Bitmap* backgroundImage;
+
 	unsigned int taskbarHeight;
+	MouseOptionsMenu* mouseOptionsMenu;
+	Task* picViewer;
 } OS;
 
 OS* initOS();

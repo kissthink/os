@@ -8,6 +8,9 @@
 #include "KBC.h"
 #include "Utilities.h"
 
+#define defaultSize 3
+#define defaultColor1 BLACK
+#define defaultColor2 WHITE
 static int hook;
 
 // mouse global variable
@@ -30,14 +33,31 @@ Mouse* newMouse() {
 	mouse->y = 0;
 	mouse->speedMultiplier = 1.4;
 
-	mouse->hasBeenUpdated = 0;
-	mouse->leftButtonReleased = 0;
-
 	mouse->byteBeingRead = 0;
 
+	mouse->leftButtonDown = 0;
+	mouse->rightButtonDown = 0;
+	mouse->middleButtonDown = 0;
+
+	mouse->leftButtonReleased = 0;
+	mouse->rightButtonReleased = 0;
+	mouse->middleButtonReleased = 0;
+
+	mouse->size = defaultSize;
+	mouse->color1 = defaultColor1;
+	mouse->color2 = defaultColor2;
+	mouse->cursorState = NORMAL;
+
+	mouse->hasBeenUpdated = 0;
 	mouse->draw = 1;
 
 	return mouse;
+}
+
+void resetMouseFlags() {
+	getMouse()->leftButtonReleased = 0;
+	getMouse()->rightButtonReleased = 0;
+	getMouse()->middleButtonReleased = 0;
 }
 
 void updateMouse(Mouse* mouse) {
@@ -67,12 +87,21 @@ void updateMouse(Mouse* mouse) {
 		if (mouse->ySign)
 			mouse->deltaY |= (-1 << 8);
 
+		// get buttons state
 		mouse->leftButtonDown = mouse->packet[0] & BIT(0);
 		mouse->rightButtonDown = mouse->packet[0] & BIT(1);
 		mouse->middleButtonDown = mouse->packet[0] & BIT(2);
+
+		// update buttons flag
 		if (mousePreviousState.leftButtonDown != 0
 				&& mouse->leftButtonDown == 0)
 			mouse->leftButtonReleased = 1;
+		if (mousePreviousState.rightButtonDown != 0
+				&& mouse->rightButtonDown == 0)
+			mouse->rightButtonReleased = 1;
+		if (mousePreviousState.middleButtonDown != 0
+				&& mouse->middleButtonDown == 0)
+			mouse->middleButtonReleased = 1;
 
 		// updating x-coord
 		if (mouse->deltaX != 0) {
@@ -94,17 +123,9 @@ void updateMouse(Mouse* mouse) {
 				mouse->y = getVerResolution() - 1;
 		}
 
-		/*
-		 // DEBUGGING BLOCK
-		 printf("Mouse status:\n");
-		 printf("x: %d\ty: %d\n", mouse->x, mouse->y);
-		 printf("LB: %d\tRB: %d\n", mouse->leftButtonDown,
-		 mouse->rightButtonDown);
-		 printf("LB-released: %d\n", mouse->leftButtonReleased);
-		 printf("\n");
-		 */
-
 		// saving state
+		mouse->deltaX = mouse->x - mousePreviousState.x;
+		mouse->deltaY = mouse->y - mousePreviousState.y;
 		mousePreviousState = *mouse;
 
 		mouse->hasBeenUpdated = 1;
@@ -159,41 +180,48 @@ int drawDirectLine(long xi, long yi, long xf, long yf, int color) {
 
 void drawCrosshair(Mouse* mouse) {
 	int x = mouse->x, y = mouse->y;
-	int size = 3;
+	int size = mouse->size;
 
-	// black borders
-	drawDirectLine(x - size, y - 1, x + size, y - 1, BLACK);
-	drawDirectLine(x - size, y + 1, x + size, y + 1, BLACK);
-	drawDirectLine(x - 1, y - size, x - 1, y + size, BLACK);
-	drawDirectLine(x + 1, y - size, x + 1, y + size, BLACK);
+	if (mouse->cursorState == NORMAL) {
+		// black borders
+		drawDirectLine(x - size, y - 1, x + size, y - 1, mouse->color1);
+		drawDirectLine(x - size, y + 1, x + size, y + 1, mouse->color1);
+		drawDirectLine(x - 1, y - size, x - 1, y + size, mouse->color1);
+		drawDirectLine(x + 1, y - size, x + 1, y + size, mouse->color1);
 
-	// white inside
-	drawDirectLine(x - size, y, x + size, y, WHITE);
-	drawDirectLine(x, y - size, x, y + size, WHITE);
+		// white inside
+		drawDirectLine(x - size, y, x + size, y, mouse->color2);
+		drawDirectLine(x, y - size, x, y + size, mouse->color2);
+	} else {
+		switch (mouse->altCursorDirection) {
+		case VERTICAL:
+			// black borders
+			drawDirectLine(x - 1, y - size, x - 1, y + size, mouse->color1);
+			drawDirectLine(x + 1, y - size, x + 1, y + size, mouse->color1);
+
+			// white inside
+			drawDirectLine(x, y - size, x, y + size, mouse->color2);
+			break;
+		case HORIZONTAL:
+			// black borders
+			drawDirectLine(x - size, y - 1, x + size, y - 1, mouse->color1);
+			drawDirectLine(x - size, y + 1, x + size, y + 1, mouse->color1);
+
+			// white inside
+			drawDirectLine(x - size, y, x + size, y, mouse->color2);
+			break;
+		case DIAGONAL:
+			break;
+		case ALT_DIAGONAL:
+			break;
+		}
+	}
 }
-
-/*
- void drawArrow(Mouse* mouse) {
- int x = mouse->x, y = mouse->y;
- int size = 8;
-
- int tx = x + size;
- int ty = y + sqrt(4 * size * size - size * size);
-
- // black borders
- drawLine(x, y, x, y + 2 * size, BLACK);
- drawLine(x, y, tx, ty, BLACK);
- drawLine(x, y + 2 * size, tx, ty, BLACK);
-
- // white inside
- }
- */
 
 void drawMouse(Mouse* mouse) {
 	flipMBuffer();
 
 	drawCrosshair(mouse);
-	//drawArrow(mouse);
 
 	flipDisplay();
 	mouse->draw = 0;
@@ -206,6 +234,21 @@ void deleteMouse(Mouse* mouse) {
 int mouseInside(int x1, int y1, int x2, int y2) {
 	return x1 <= getMouse()->x && getMouse()->x <= x2 && y1 <= getMouse()->y
 			&& getMouse()->y <= y2;
+}
+
+void resetMouseCursor() {
+	getMouse()->cursorState = NORMAL;
+	getMouse()->size = defaultSize;
+	getMouse()->color1 = defaultColor1;
+	getMouse()->color2 = defaultColor2;
+}
+
+void altMouseCursor(MouseAltCursorDirection altCursorDirection) {
+	getMouse()->cursorState = ALTERNATIVE;
+	getMouse()->size = 2 * defaultSize;
+	getMouse()->color1 = defaultColor2;
+	getMouse()->color2 = defaultColor1;
+	mouse->altCursorDirection = altCursorDirection;
 }
 
 int subscribeMouse() {

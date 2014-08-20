@@ -142,6 +142,17 @@ int setPixel(long x, long y, int color) {
 	return 0;
 }
 
+int setBufferPixel(char* buffer, long x, int color) {
+	if (x < 0)
+		return -1;
+
+	int id = x * getBytesPerPixel();
+	buffer[id] = color & 0xFF;
+	buffer[id + 1] = (color >> 8) & 0xFF;
+
+	return 0;
+}
+
 unsigned short getPixel(long x, long y) {
 	if (x < 0 || y < 0 || x >= getHorResolution() || y >= getVerResolution())
 		return -1;
@@ -178,7 +189,7 @@ int drawLine(long xi, long yi, long xf, long yf, int color) {
 	int inc1 = d - a;	// inc1 = 2*(b-a);
 
 	int i, x = xi, y = yi;
-	for (i = 0; i <= a; i++, x++) {
+	for (i = 0; i < a; i++, x++) {
 		invertXY ? setPixel(y, x, color) : setPixel(x, y, color);
 
 		if (d >= 0)
@@ -202,15 +213,15 @@ int drawRectangle(long xi, long yi, long xf, long yf, int color) {
 		swap(int, xi, xf);
 
 	// horizontal borders
-	for (i = xi; i <= xf; i++) {
+	for (i = xi; i < xf; i++) {
 		setPixel(i, yi, color);
-		setPixel(i, yf, color);
+		setPixel(i, yf - 1, color);
 	}
 
 	// vertical borders
 	for (i = yi + 1; i < yf; i++) {
 		setPixel(xi, i, color);
-		setPixel(xf, i, color);
+		setPixel(xf - 1, i, color);
 	}
 
 	return 0;
@@ -225,20 +236,39 @@ int drawFilledRectangle(long xi, long yi, long xf, long yf, int color) {
 	if (xi > xf)
 		swap(int, xi, xf);
 
-	// process one line
+	// prepare buffer
+	char* line = (char*) malloc((xf - xi) * bytesPerPixel);
 	int i;
-	for (i = xi; i < xf; i++)
-		setPixel(i, yi, color);
-
-	// get pointer to that line
-	char* line = buffer + (xi + yi * horResolution) * bytesPerPixel;
+	for (i = 0; i < xf - xi; i++)
+		setBufferPixel(line, i, color);
 
 	int screenWidthBytes = horResolution * bytesPerPixel;
 	int lineBytes = (xf - xi) * bytesPerPixel;
 
 	// copy and paste first line
-	for (i = 1; i < yf - yi; i++)
-		memcpy(line + i * screenWidthBytes, line, lineBytes);
+	char* start = buffer + xi * bytesPerPixel + yi * screenWidthBytes;
+	for (i = 0; i < yf - yi; i++) {
+		int t = i * screenWidthBytes;
+
+		if (yi + i >= 0 && yi + i < getVerResolution()) {
+			int size;
+
+			if (xi < 0) {
+				size = xf * bytesPerPixel;
+				memcpy(start + t - xi * bytesPerPixel, line, size);
+			} else {
+				if (xf > getHorResolution())
+					size = (getHorResolution() - xi) * bytesPerPixel;
+				else
+					size = lineBytes;
+
+				memcpy(start + t, line, size);
+			}
+		}
+	}
+
+	// destroy buffer
+	free(line);
 
 	return 0;
 }

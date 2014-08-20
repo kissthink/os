@@ -1,7 +1,0 @@
-initLog: logging successfully initialized
-main: starting program
-horResolution: 1024
-verResolution: 768
-OS: starting
-mouse: trying to enable mouse packets
-main: terminating program
