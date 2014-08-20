@@ -5,12 +5,12 @@ A GUI for minix 3.1.8.
 
 ***
 #Features
-- [x] BMP images working;
+- [x] BMP images (16-bit 5-6-5);
 - [x] dragging windows;
 - [x] resizing windows (buggy);
 - [ ] minimize/maximize/close windows;
 - [ ] taskbar;
-- [ ] start buton.
+- [ ] start button.
 
 ***
 #Screenshots
